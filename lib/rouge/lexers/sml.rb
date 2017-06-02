@@ -41,9 +41,7 @@ module Rouge
         rule /[(\[{]/, Punctuation, :main
         rule /[)\]}]/, Punctuation, :pop!
 
-        rule /\b(let|if|local)\b(?!')/, Keyword::Reserved do
-          push; push
-        end
+        rule /\b(let|if|local)\b(?!')/, Keyword::Reserved, :push
 
         rule /\b(struct|sig|while)\b(?!')/ do
           token Keyword::Reserved
@@ -80,7 +78,7 @@ module Rouge
       end
 
       state :core do
-        rule /[()\[\]{},;_]|[.][.][.]/, Punctuation
+        rule /[()\[\]{},;\+\*]|[.][.][.]/, Punctuation
         rule /#"/, Str::Char, :char
         rule /"/, Str::Double, :string
         rule /~?0x[0-9a-fA-F]+/, Num::Hex
