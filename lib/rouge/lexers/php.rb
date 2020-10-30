@@ -7,7 +7,7 @@ module Rouge
       title "PHP"
       desc "The PHP scripting language (php.net)"
       tag 'php'
-      aliases 'php', 'php3', 'php4', 'php5'
+      aliases 'php3', 'php4', 'php5'
       filenames '*.php', '*.php[345t]','*.phtml',
                 # Support Drupal file extensions, see:
                 # https://github.com/gitlabhq/gitlabhq/issues/8900
@@ -46,6 +46,10 @@ module Rouge
           print private protected public require require_once return self
           static switch throw try var while xor yield
         )
+      end
+
+      def start_inline?
+        !!@start_inline
       end
 
       def self.builtins

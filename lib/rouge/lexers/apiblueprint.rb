@@ -2,14 +2,14 @@
 
 module Rouge
   module Lexers
-    load_lexer 'markdown.rb'
+    preload 'markdown'
 
     class APIBlueprint < Markdown
       title 'API Blueprint'
       desc 'Markdown based API description language.'
 
       tag 'apiblueprint'
-      aliases 'apiblueprint', 'apib'
+      aliases 'apib'
       filenames '*.apib'
       mimetypes 'text/vnd.apiblueprint'
 

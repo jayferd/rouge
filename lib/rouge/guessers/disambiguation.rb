@@ -6,6 +6,12 @@ module Rouge
       include Util
       include Lexers
 
+      # unlike Lexers.const_missing, this will return
+      # only the LangSpec without forcing it to load.
+      def self.const_missing(name)
+        Lexer.lazy_constants.fetch(name) { super }
+      end
+
       def initialize(filename, source)
         @filename = File.basename(filename)
         @source = source
@@ -104,6 +110,8 @@ module Rouge
         next Cpp if matches?(/^\s*#include/)
         next Hack if matches?(/^<\?hh/)
         next Hack if matches?(/(\(|, ?)\$\$/)
+        next Hack if matches?(/async function [a-zA-Z]/)
+        next Hack if matches?(/\): Awaitable</)
 
         Cpp
       end

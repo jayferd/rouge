@@ -3,13 +3,12 @@
 
 module Rouge
   module Lexers
-    load_lexer 'javascript.rb'
+    preload 'javascript'
 
     class Qml < Javascript
       title "QML"
       desc 'QML, a UI markup language'
       tag 'qml'
-      aliases 'qml'
       filenames '*.qml'
 
       mimetypes 'application/x-qml', 'text/x-qml'

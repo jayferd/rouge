@@ -3,20 +3,18 @@
 
 module Rouge
   module Lexers
-    load_lexer 'php.rb'
+    preload 'php'
 
     class Hack < PHP
       title 'Hack'
       desc 'The Hack programming language (hacklang.org)'
       tag 'hack'
-      aliases 'hack', 'hh'
+      aliases 'hh'
       filenames '*.php', '*.hh'
 
       def self.detect?(text)
         return true if /<\?hh/ =~ text
         return true if text.shebang?('hhvm')
-        return true if /async function [a-zA-Z]/ =~ text
-        return true if /\): Awaitable</ =~ text
 
         return false
       end

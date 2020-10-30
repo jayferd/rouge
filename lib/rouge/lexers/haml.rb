@@ -12,7 +12,6 @@ module Rouge
       desc "The Haml templating system for Ruby (haml.info)"
 
       tag 'haml'
-      aliases 'HAML'
 
       filenames '*.haml'
       mimetypes 'text/x-haml'
@@ -30,7 +29,7 @@ module Rouge
           'javascript' => Javascript.new(options),
           'css' => CSS.new(options),
           'ruby' => ruby,
-          'erb' => ERB.new(options),
+          'erb' => Lexers::ERB.new(options),
           'markdown' => Markdown.new(options),
           'sass' => Sass.new(options),
           # TODO

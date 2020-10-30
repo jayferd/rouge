@@ -16,6 +16,15 @@ describe Rouge::Lexer do
     assert { (Rouge::Lexer.guess(filename: 'foo.pl') rescue nil) == nil }
   end
 
+  it 'looks up a cached lexer by alias' do
+    Rouge::Lexer.cache :RougeTest, 'rouge-test' do
+      @tag = 'rouge-test'
+      @aliases = ['rouge-test-alias']
+    end
+
+    assert { Rouge::Lexer.find('rouge-test-alias').tag == 'rouge-test' }
+  end
+
   it 'customizes ambiguous cases in .guess' do
     assert { Rouge::Lexer.guess(filename: 'foo.pl') { :fallback } == :fallback }
   end
@@ -184,6 +193,27 @@ describe Rouge::Lexer do
 
     refute { NonDetectableLexer.methods(false).include?(:detect?) }
     refute { NonDetectableLexer.detectable? }
+  end
+
+  it 'handles lexer options' do
+    lexer = Class.new(Rouge::RegexLexer) do
+      option :embed, 'An example embedded lexer option'
+
+      attr_reader :embed
+      def initialize(*)
+        super
+        @embed = lexer_option(:embed) { 'html' }
+      end
+    end
+
+    assert { Rouge::Lexers::HTML === lexer.new.embed }
+    assert { Rouge::Lexers::PHP === lexer.new(embed: 'php').embed }
+    special = Rouge::Lexer.find_fancy('escape?lang=erb&lang.parent=php&lang.parent.start_inline=1')
+
+    assert { Rouge::Lexers::Escape === special }
+    assert { Rouge::Lexers::ERB === special.lang }
+    assert { Rouge::Lexers::PHP === special.lang.parent }
+    assert { special.lang.parent.start_inline? }
   end
 
   it 'handles boolean options' do
