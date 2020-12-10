@@ -166,7 +166,7 @@ module Rouge
 
         # numbers
         dot = /[.][0-9_]+/
-        exp = /e[-+]?[0-9_]+/
+        exp = /[Ee][-+]?[0-9_]+/
         flt = /f32|f64/
 
         rule %r(

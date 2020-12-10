@@ -283,6 +283,8 @@ mod test_literals {
     #[uint = 100u];
     #[mach_int = 100u32];
     #[float = 1.0];
+    #[float1 = 1.0e-2];
+    #[float2 = 1E+2];
     #[mach_float = 1.0f32];
     #[bool = true];
     mod m {
