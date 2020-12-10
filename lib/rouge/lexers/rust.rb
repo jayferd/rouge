@@ -22,10 +22,13 @@ module Rouge
 
       def self.keywords
         @keywords ||= %w(
-          as assert async await break const continue copy do drop else enum extern
-          fail false fn for if impl let log loop match mod move mut priv pub pure
-          ref return self static struct true trait type unsafe use where
-          while box
+          as async await break const continue crate dyn else enum extern false
+          fn for if impl in let log loop match mod move mut pub ref return self
+          Self static struct super trait true type unsafe use where while
+          abstract become box do final macro
+          override priv typeof unsized virtual
+          yield try
+          union
         )
       end
 
