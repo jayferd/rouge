@@ -282,6 +282,7 @@ mod test_literals {
     #[int = 100];
     #[uint = 100u];
     #[mach_int = 100u32];
+    #[isize = 100isize];
     #[float = 1.0];
     #[float1 = 1.0e-2];
     #[float2 = 1E+2];
