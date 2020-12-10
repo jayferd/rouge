@@ -164,6 +164,14 @@ module Rouge
         rule %r/"/, Str, :string
         rule %r/r(#*)".*?"\1/m, Str
 
+        # bytes
+        rule %r(
+          b' (?: #{escapes} | [^\\] ) '
+        )x, Str::Char
+
+        rule %r/b"/, Str, :string
+        rule %r/br(#*)".*?"\1/m, Str
+
         # numbers
         dot = /[.][0-9_]+/
         exp = /[Ee][-+]?[0-9_]+/

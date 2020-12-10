@@ -38,6 +38,9 @@ println!(r###"r##"r#""#"##"###);
 println!(r#"
   "New line in a raw string"
 "#);
+println!(b'a');
+println!(b"byte string literal");
+println!(br##"raw byte string literal"##);
 
 trait iterable<A> {
     fn iterate(blk: fn(x: &A) -> bool);
