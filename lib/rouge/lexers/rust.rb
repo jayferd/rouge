@@ -192,7 +192,7 @@ module Rouge
           ( 0b[10_]+
           | 0x[0-9a-fA-F_]+
           | 0o[0-7]+
-          | [0-9_]+
+          | [0-9][0-9_]*
           ) (u#{size}?|i#{size})?
         )x, Num::Integer
 
