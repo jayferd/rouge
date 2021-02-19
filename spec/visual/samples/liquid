@@ -119,15 +119,17 @@ Some other {{ output }}!
 {% endfor %}
 
 {% for char in 'The Quick Brown Fox' %}
-  {{ char | upcase }}
+  {{ char | upcase # inline comment }}
 {% endfor %}
 
 {% for char in "Hello World" reversed %}
   {% echo char | url_encode %}
-{% endfor %}
+{% endfor
+  # inline comment %}
 
 {% liquid %}
 {% liquid
+  # inline comment
   assign size = "one two" | split: " "
   for value in size
     echo value
