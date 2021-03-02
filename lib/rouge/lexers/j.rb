@@ -82,11 +82,33 @@ module Rouge
       end
 
       def self.control_words_id
-        @control_words_id ||= Set.new %w(for goto label)
+        @control_words_id ||= {
+          'for' => Name, 'goto' => Name::Label, 'label' => Name::Label,
+        }
       end
 
       state :expr do
         rule %r/\s+/, Text
+
+        # https://code.jsoftware.com/wiki/Vocabulary/DirectDefinition
+        rule %r/\{\{(\))?(?![.:])/ do |m|
+          token Punctuation
+          push(m[1] ? :dd : :dd_expr)
+        end
+
+        rule %r/\}\}(?![.:])/, Punctuation
+
+        rule %r/(\{)(\})(?![.:])/ do
+          groups Name::Function, Operator
+        end
+
+        rule %r/(\})(\{)(?![.:])/ do
+          groups Operator, Name::Function
+        end
+
+        rule %r/^([ \t]*)(:)([ \t\r]*\n)/ do
+          groups Text, Punctuation, Text
+        end
 
         rule %r'([!-&(-/:-@\[-^`{-~]|[A-Za-z]\b)([.:]*)' do |m|
           token J.primitive(m[1], m[2])
@@ -104,24 +126,21 @@ module Rouge
 
         rule %r/NB\.(?![.:]).*/, Comment::Single
 
-        rule %r/([A-Za-z]\w*)([.:]*)/ do |m|
-          if m[2] == '.'
-            word, sep, id = m[1].partition '_'
-            list = if sep.empty?
-              J.control_words
-            elsif not id.empty?
-              J.control_words_id
+        rule %r/([A-Za-z][\dA-Za-z]*)(?:(_)(\w*))?([.:]*)/ do |m|
+          t = Error
+          if m[4] == '.'
+            if m[2]
+              if (n = J.control_words_id[m[1]]) and not m[3].empty?
+                groups Keyword, Keyword, n, Keyword
+                t = nil
+              end
+            elsif J.control_words.include? m[1]
+              t = Keyword
             end
-            if list and list.include? word
-              token Keyword, word + sep
-              token((word == 'for' ? Name : Name::Label), id)
-              token Keyword, m[2]
-            else
-              token Error
-            end
-          else
-            token m[2].empty? ? Name : Error
+          elsif m[4].empty?
+            t = Name
           end
+          token t if t
         end
       end
 
@@ -168,7 +187,6 @@ module Rouge
           @note_next = true
         end
 
-        rule %r/[mnuvxy]\b(?![.:])/, Name
         mixin :expr
       end
 
@@ -205,6 +223,7 @@ module Rouge
         rule %r/''/, Str::Single, :q_str
         rule %r/'|$/, Punctuation, :pop!
         rule %r/NB\.(?![.:])([^'\n]|'')*/, Comment::Single
+        rule %r/(?:\{\{|\}\})(?![.:])/, Error
         mixin :expr
       end
 
@@ -217,19 +236,16 @@ module Rouge
 
       state :note do
         mixin :delimiter
-        rule %r/.+\n?/, Comment::Multiline
+        rule %r/.+\n*/, Comment::Multiline
       end
 
       state :noun do
         mixin :delimiter
-        rule %r/.+\n?/, Str::Heredoc
+        rule %r/.+\n*/, Str::Heredoc
       end
 
       state :code do
         mixin :delimiter
-        rule %r/^([ \t]*)(:)([ \t\r]*)$/ do
-          groups Text, Punctuation, Text
-        end
         mixin :expr
       end
 
@@ -238,6 +254,37 @@ module Rouge
           groups Text, Punctuation, Text
           pop!
         end
+      end
+
+      state :dd do
+        rule %r/n/ do
+          token Keyword
+          goto :dd_noun
+        end
+        rule %r/[acdmv](?![\w.:])|\*(?![.:])/ do
+          token Keyword
+          goto :dd_expr
+        end
+        rule(//) { goto :dd_expr }
+      end
+
+      state :dd_noun do
+        rule %r/(?:[^}\n]|\}(?!\}))+/, Str::Heredoc
+        rule %r/\}\}/, Punctuation, :pop!
+        rule %r/\n+/ do
+          token Str::Heredoc
+          goto :dd_noun_m
+        end
+      end
+
+      state :dd_noun_m do
+        rule %r/[^\}].*\n*/, Str::Heredoc
+        rule %r/^\}\}/, Punctuation, :pop!
+      end
+
+      state :dd_expr do
+        rule %r/\}\}(?![.:])/, Punctuation, :pop!
+        mixin :expr
       end
     end
   end
