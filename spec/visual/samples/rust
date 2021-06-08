@@ -38,6 +38,9 @@ println!(r###"r##"r#""#"##"###);
 println!(r#"
   "New line in a raw string"
 "#);
+println!(b'a');
+println!(b"byte string literal");
+println!(br##"raw byte string literal"##);
 
 trait iterable<A> {
     fn iterate(blk: fn(x: &A) -> bool);
@@ -282,9 +285,11 @@ mod test_literals {
     #[int = 100];
     #[uint = 100u];
     #[mach_int = 100u32];
+    #[isize = 100isize];
     #[float = 1.0];
+    #[float1 = 1.0e-2];
+    #[float2 = 1E+2];
     #[mach_float = 1.0f32];
-    #[nil = ()];
     #[bool = true];
     mod m {
         #[legacy_exports]; }
@@ -417,4 +422,11 @@ async fn learn_and_sing() {
 fn tuple_access() {
     let t: (i32, i32) = (42, 13);
     let f: t.0;
+}
+
+// https://github.com/rouge-ruby/rouge/issues/1664
+fn regression_test_1664() {
+    let _unused_variable = "foo";
+    let _ = 123;
+    let _i = 0;
 }

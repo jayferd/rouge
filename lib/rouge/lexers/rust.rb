@@ -22,10 +22,13 @@ module Rouge
 
       def self.keywords
         @keywords ||= %w(
-          as assert async await break const continue copy do drop else enum extern
-          fail false fn for if impl let log loop match mod move mut priv pub pure
-          ref return self static struct true trait type unsafe use where
-          while box
+          as async await break const continue crate dyn else enum extern false
+          fn for if impl in let log loop match mod move mut pub ref return self
+          Self static struct super trait true type unsafe use where while
+          abstract become box do final macro
+          override priv typeof unsized virtual
+          yield try
+          union
         )
       end
 
@@ -59,7 +62,7 @@ module Rouge
       escapes = %r(
         \\ ([nrt'"\\0] | x#{hex}{2} | u#{hex}{4} | U#{hex}{8})
       )x
-      size = /8|16|32|64/
+      size = /8|16|32|64|128|size/
 
       # Although not officially part of Rust, the rustdoc tool allows code in
       # comments to begin with `#`. Code like this will be evaluated but not
@@ -154,7 +157,8 @@ module Rouge
 
       state :has_literals do
         # constants
-        rule %r/\b(?:true|false|nil)\b/, Keyword::Constant
+        rule %r/\b(?:true|false)\b/, Keyword::Constant
+
         # characters
         rule %r(
           ' (?: #{escapes} | [^\\] ) '
@@ -163,9 +167,17 @@ module Rouge
         rule %r/"/, Str, :string
         rule %r/r(#*)".*?"\1/m, Str
 
+        # bytes
+        rule %r(
+          b' (?: #{escapes} | [^\\] ) '
+        )x, Str::Char
+
+        rule %r/b"/, Str, :string
+        rule %r/br(#*)".*?"\1/m, Str
+
         # numbers
         dot = /[.][0-9_]+/
-        exp = /e[-+]?[0-9_]+/
+        exp = /[Ee][-+]?[0-9_]+/
         flt = /f32|f64/
 
         rule %r(
@@ -180,7 +192,7 @@ module Rouge
           ( 0b[10_]+
           | 0x[0-9a-fA-F_]+
           | 0o[0-7]+
-          | [0-9_]+
+          | [0-9][0-9_]*
           ) (u#{size}?|i#{size})?
         )x, Num::Integer
 
